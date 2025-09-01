@@ -1,105 +1,123 @@
-# PakeLink
+# PakeLink - Sistem Administrasi PKL
 
-PakeLink: Catat PKL Lo, Biar Nggak Lupa Rasanya! 🤪
+![PakeLink Logo](https://via.placeholder.com/150x50?text=PakeLink)
 
-Aplikasi pengelolaan administrasi dan pelaporan Praktik Kerja Lapangan (PKL) untuk siswa SMKN 7 Samarinda.
+PakeLink adalah sistem administrasi dan pelaporan Praktik Kerja Lapangan (PKL) untuk SMKN 7 Samarinda. Aplikasi ini memudahkan pengelolaan, monitoring, dan evaluasi kegiatan PKL bagi siswa, pembimbing sekolah, pembimbing industri, dan administrator.
 
 ## Fitur Utama
 
-- **Otentikasi & Otorisasi**:
-  - Sistem login untuk siswa, pembimbing DU/DI, dan pembimbing sekolah
-  - Manajemen user (CRUD)
+- **Manajemen Siswa PKL**  
+  Kelola data siswa yang mengikuti PKL, penempatan, dan pembimbing yang ditugaskan.
 
-- **Form & Manajemen Data**:
-  - Form pendaftaran siswa PKL
-  - Form pendaftaran tempat PKL
-  - Validasi data
-  - Autocomplete untuk nama sekolah
+- **Manajemen DU/DI (Dunia Usaha/Dunia Industri)**  
+  Kelola data perusahaan atau instansi tempat siswa melaksanakan PKL.
 
-- **Jurnal Kegiatan Harian**:
-  - Pencatatan kegiatan harian
-  - Paraf dan evaluasi mingguan pembimbing
+- **Jurnal Kegiatan**  
+  Siswa dapat mencatat kegiatan harian, yang dapat divalidasi oleh pembimbing.
 
-- **Absensi**:
-  - Pencatatan absensi siswa
-  - Tanda tangan pembimbing DU/DI dan sekolah
+- **Absensi Digital**  
+  Pencatatan kehadiran siswa selama PKL dengan validasi dari pembimbing.
 
-- **Agenda Konsultasi**:
-  - Pencatatan agenda konsultasi
-  - Paraf pembimbing
+- **Konsultasi**  
+  Fitur untuk mengajukan dan mencatat konsultasi antara siswa dan pembimbing.
 
-- **Peraturan PKL**:
-  - Tampilan peraturan PKL
+- **Laporan**  
+  Berbagai jenis laporan terkait kegiatan PKL, seperti laporan kehadiran, jurnal, dan evaluasi siswa.
 
-- **Laporan & Analisis**:
-  - Laporan rekap data siswa dan tempat PKL
-  - Laporan absensi dan jurnal kegiatan
+## Teknologi yang Digunakan
 
-## Teknologi
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Styling**: Tailwind CSS
+- **DOM Manipulation**: jQuery
+- **Data Storage**: Web Storage API (localStorage)
+- **Digital Signature**: SignaturePad.js
 
-- **Frontend**: React, Material UI, Redux Toolkit
-- **Backend**: Node.js, Express.js, MongoDB
-- **Autentikasi**: JWT (JSON Web Tokens)
+## Struktur Aplikasi
+
+```
+app/
+├── index.html            # Halaman utama aplikasi
+├── assets/               # Gambar, font, dan resource statis lainnya
+└── js/
+    ├── app.js            # Core aplikasi dan fungsionalitas umum
+    ├── students.js       # Pengelolaan data siswa
+    ├── companies.js      # Pengelolaan data DU/DI
+    ├── journals.js       # Pengelolaan jurnal kegiatan
+    ├── attendance.js     # Pengelolaan absensi
+    ├── consultations.js  # Pengelolaan konsultasi
+    └── reports.js        # Pembuatan laporan
+```
+
+## Peran Pengguna
+
+1. **Administrator**
+   - Mengelola seluruh data sistem
+   - Mengatur penempatan siswa dan pembimbing
+   - Melihat dan mengekspor semua laporan
+
+2. **Pembimbing Sekolah**
+   - Memantau kegiatan siswa yang dibimbing
+   - Memvalidasi jurnal kegiatan
+   - Melakukan konsultasi dengan siswa
+   - Membuat evaluasi siswa
+
+3. **Pembimbing DU/DI**
+   - Memantau kehadiran dan kegiatan siswa
+   - Memvalidasi absensi dan jurnal kegiatan
+   - Melakukan konsultasi dengan siswa
+   - Membuat evaluasi siswa
+
+4. **Siswa**
+   - Mengisi jurnal kegiatan harian
+   - Mencatat kehadiran
+   - Mengajukan konsultasi dengan pembimbing
+   - Melihat dan mencetak laporan individu
 
 ## Cara Penggunaan
 
-### Prasyarat
+### Instalasi dan Setup
 
-- Node.js (v14 atau lebih baru)
-- MongoDB
-- npm atau yarn
-
-### Instalasi
-
-1. Clone repositori ini
-```
-git clone https://github.com/yourusername/PakeLink.git
-cd PakeLink
-```
-
-2. Instalasi dependencies server
-```
-cd server
-npm install
-```
-
-3. Instalasi dependencies client
-```
-cd ../client
-npm install
-```
-
-4. Setup environment variables
-   - Buat file `.env` di folder `server` dengan isi:
+1. Clone repositori ini ke komputer lokal Anda:
    ```
-   PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/pakelink
-   JWT_SECRET=your_jwt_secret_key
-   NODE_ENV=development
+   git clone https://github.com/fk0u/PakeLink.git
    ```
 
-### Menjalankan Aplikasi
+2. Buka folder aplikasi:
+   ```
+   cd PakeLink/app
+   ```
 
-1. Jalankan server
-```
-cd server
-npm run dev
-```
+3. Buka `index.html` di browser web Anda atau gunakan server lokal:
+   ```
+   # Menggunakan Python SimpleHTTPServer
+   python -m http.server
+   ```
 
-2. Jalankan client
-```
-cd client
-npm start
-```
+4. Aplikasi akan berjalan di `http://localhost:8000`
 
-3. Buka browser dan akses `http://localhost:3000`
+### Penggunaan Awal
 
-## Role Pengguna
+1. **Register Akun**: Buat akun baru dengan memilih peran yang sesuai (admin, pembimbing, atau siswa).
+2. **Login**: Masuk ke aplikasi menggunakan email dan password yang telah didaftarkan.
+3. **Dashboard**: Akses fitur-fitur aplikasi sesuai dengan peran pengguna melalui menu navigasi.
 
-- **Admin**: Akses penuh ke semua fitur dan manajemen pengguna
-- **Siswa**: Mengisi jurnal kegiatan, melihat absensi, dan mengatur konsultasi
-- **Pembimbing DU/DI**: Menandatangani jurnal, mengisi absensi, dan evaluasi
-- **Pembimbing Sekolah**: Memonitor siswa, validasi jurnal, dan laporan
+## Demo Aplikasi
+
+Demo online tersedia di: [https://fk0u.github.io/PakeLink](https://fk0u.github.io/PakeLink)
+
+Akun demo:
+- **Admin**: admin@example.com / password123
+- **Pembimbing Sekolah**: supervisor@school.com / password123
+- **Pembimbing DU/DI**: supervisor@company.com / password123
+- **Siswa**: student@example.com / password123
+
+## Pengembangan Lokal
+
+Aplikasi ini menggunakan penyimpanan lokal (localStorage), sehingga tidak memerlukan server backend. Namun, untuk pengembangan lebih lanjut, Anda dapat mengintegrasikan dengan backend menggunakan:
+
+- RESTful API dengan Node.js/Express
+- Database seperti MySQL atau MongoDB
+- Autentikasi dengan JWT atau OAuth
 
 ## Tim Pengembang
 

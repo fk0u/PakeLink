@@ -1,12 +1,12 @@
 /**
- * Main application functionality
+ * PakeLink - Main Application
+ * Core functionality and app initialization
  */
 
 // DOM Elements
 const appContainer = document.getElementById('app');
 const navLinks = document.getElementById('navLinks');
-const toast = document.getElementById('toast');
-const toastMessage = document.getElementById('toastMessage');
+const mobileNavLinks = document.getElementById('mobileNavLinks');
 
 // Page templates
 const PAGES = {
@@ -28,25 +28,182 @@ const PAGES = {
   CONSULTATIONS: 'consultations',
   CONSULTATION_FORM: 'consultation-form',
   CONSULTATION_DETAIL: 'consultation-detail',
-  REGULATIONS: 'regulations'
+  REPORTS: 'reports',
+  SETTINGS: 'settings'
+};
+
+// User roles
+const ROLES = {
+  ADMIN: 'admin',
+  SCHOOL_SUPERVISOR: 'school_supervisor',
+  COMPANY_SUPERVISOR: 'company_supervisor',
+  STUDENT: 'student'
 };
 
 // Current page
 let currentPage = PAGES.HOME;
+// Current user
+let currentUser = null;
 
 // Initialize the application
 function initApp() {
-  // Check if user is logged in
-  if (isLoggedIn()) {
+  console.log('Initializing PakeLink application...');
+  
+  // Check if user data exists in localStorage
+  const savedUser = PakeLinkStorage.get('currentUser');
+  if (savedUser) {
+    currentUser = savedUser;
+    console.log('User found in localStorage:', currentUser);
     renderNavigation();
     renderPage(PAGES.DASHBOARD);
   } else {
+    console.log('No user found, showing home page');
     renderNavigation();
     renderHomePage();
+  }
+  
+  // Check for app updates if this is a PWA
+  checkForAppUpdates();
+  
+  // Add event listener for online/offline status
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  
+  // Initial online status check
+  updateOnlineStatus();
+}
+
+// Check for PWA updates
+function checkForAppUpdates() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      Toast.fire({
+        icon: 'info',
+        title: 'Aplikasi telah diperbarui. Silakan refresh halaman.'
+      });
+    });
+  }
+}
+
+// Update online status
+function updateOnlineStatus() {
+  const isOnline = navigator.onLine;
+  if (!isOnline) {
+    Toast.fire({
+      icon: 'warning',
+      title: 'Anda sedang offline. Beberapa fitur mungkin tidak tersedia.'
+    });
   }
 }
 
 // Render navigation menu based on user role
+function renderNavigation() {
+  let navHTML = '';
+  let mobileNavHTML = '';
+  
+  if (currentUser) {
+    // Common navigation items for logged in users
+    const commonItems = [
+      { id: PAGES.DASHBOARD, label: 'Dashboard', icon: 'home' },
+      { id: PAGES.PROFILE, label: 'Profil', icon: 'user' }
+    ];
+    
+    // Role specific navigation items
+    let roleItems = [];
+    
+    switch(currentUser.role) {
+      case ROLES.ADMIN:
+        roleItems = [
+          { id: PAGES.STUDENTS, label: 'Siswa', icon: 'users' },
+          { id: PAGES.COMPANIES, label: 'DU/DI', icon: 'building' },
+          { id: PAGES.JOURNALS, label: 'Jurnal', icon: 'book' },
+          { id: PAGES.ATTENDANCE, label: 'Absensi', icon: 'calendar' },
+          { id: PAGES.CONSULTATIONS, label: 'Konsultasi', icon: 'chat' },
+          { id: PAGES.REPORTS, label: 'Laporan', icon: 'chart-bar' },
+          { id: PAGES.SETTINGS, label: 'Pengaturan', icon: 'cog' }
+        ];
+        break;
+        
+      case ROLES.SCHOOL_SUPERVISOR:
+      case ROLES.COMPANY_SUPERVISOR:
+        roleItems = [
+          { id: PAGES.STUDENTS, label: 'Siswa', icon: 'users' },
+          { id: PAGES.JOURNALS, label: 'Jurnal', icon: 'book' },
+          { id: PAGES.ATTENDANCE, label: 'Absensi', icon: 'calendar' },
+          { id: PAGES.CONSULTATIONS, label: 'Konsultasi', icon: 'chat' },
+          { id: PAGES.REPORTS, label: 'Laporan', icon: 'chart-bar' }
+        ];
+        break;
+        
+      case ROLES.STUDENT:
+        roleItems = [
+          { id: PAGES.JOURNALS, label: 'Jurnal', icon: 'book' },
+          { id: PAGES.ATTENDANCE, label: 'Absensi', icon: 'calendar' },
+          { id: PAGES.CONSULTATIONS, label: 'Konsultasi', icon: 'chat' }
+        ];
+        break;
+    }
+    
+    // Combine common and role specific items
+    const navItems = [...commonItems, ...roleItems];
+    
+    // Add logout button
+    navItems.push({ id: 'logout', label: 'Logout', icon: 'logout' });
+    
+    // Generate HTML for both desktop and mobile navs
+    navItems.forEach(item => {
+      const isActive = currentPage === item.id ? 'text-white bg-primary-800' : 'text-primary-100 hover:bg-primary-800 hover:text-white';
+      
+      navHTML += `
+        <li>
+          <a href="#" class="${isActive} px-3 py-2 rounded-md text-sm font-medium flex items-center" data-page="${item.id}">
+            ${getIconSvg(item.icon)}
+            <span class="ml-1">${item.label}</span>
+          </a>
+        </li>
+      `;
+      
+      mobileNavHTML += `
+        <li>
+          <a href="#" class="${isActive} block px-3 py-2 rounded-md text-base font-medium" data-page="${item.id}">
+            ${getIconSvg(item.icon)}
+            <span class="ml-2">${item.label}</span>
+          </a>
+        </li>
+      `;
+    });
+  } else {
+    // Navigation for not logged in users
+    navHTML = `
+      <li>
+        <a href="#" class="text-primary-100 hover:bg-primary-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium" data-page="login">
+          ${getIconSvg('login')}
+          <span class="ml-1">Login</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="text-primary-100 hover:bg-primary-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium" data-page="register">
+          ${getIconSvg('user-plus')}
+          <span class="ml-1">Register</span>
+        </a>
+      </li>
+    `;
+    
+    mobileNavHTML = `
+      <li>
+        <a href="#" class="text-primary-100 hover:bg-primary-800 hover:text-white block px-3 py-2 rounded-md text-base font-medium" data-page="login">
+          ${getIconSvg('login')}
+          <span class="ml-2">Login</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="text-primary-100 hover:bg-primary-800 hover:text-white block px-3 py-2 rounded-md text-base font-medium" data-page="register">
+          ${getIconSvg('user-plus')}
+          <span class="ml-2">Register</span>
+        </a>
+      </li>
+    `;
+  }
 function renderNavigation() {
   if (!navLinks) return;
   
